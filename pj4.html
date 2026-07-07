@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP API Lab</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .result { margin-top: 20px; padding: 10px; border-left: 5px solid #2ecc71; background: #e8f8f5; }
+        .error { color: #e74c3c; background: #fadbd8; border-left: 5px solid #e74c3c; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form method="GET">
+        <input type="text" name="user_name" placeholder="Enter your name" required>
+        <button type="submit">Call API</button>
+    </form>
+
+    <?php
+    if (isset($_GET['user_name'])) {
+        try {
+            // Clean input
+            $name = htmlspecialchars($_GET['user_name']);
+            
+            // Call endpoint (Update URL if your local path is different)
+            $url = "http://localhost/api/greet.php?name=" . urlencode($name);
+            $response = file_get_contents($url);
+            
+            if ($response === false) {
+                throw new Exception("Could not connect to the API.");
+            }
+
+            // Decode JSON
+            $data = json_decode($response, true);
+            
+            // Show result
+            echo "<div class='result'><strong>API says:</strong> " . htmlspecialchars($data['greeting']) . "</div>";
+            
+        } catch (Exception $e) {
+            echo "<div class='result error'>Oops! Something went wrong: " . $e->getMessage() . "</div>";
+        }
+    }
+    ?>
+</div>
+</body>
+</html>
